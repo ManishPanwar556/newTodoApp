@@ -1,35 +1,18 @@
 package com.example.todoapp.repository
 
-import android.app.Application
-import android.content.Context
 import androidx.lifecycle.LiveData
-import com.example.todoapp.room.Task
 import com.example.todoapp.room.TaskDao
-import com.example.todoapp.room.TaskDatabase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-
-
-class TaskRepository(context: Context){
-    private var taskDao:TaskDao= TaskDatabase.getInstance(context)!!.taskDao
-
-    private lateinit var allTask:LiveData<List<TaskDao>>
-
-    fun getAllData():LiveData<List<Task>>{
-        lateinit var task: LiveData<List<Task>>
-        task=taskDao.getAllTask()
-        return task
+import com.example.todoapp.room.TaskEntity
+import javax.inject.Inject
+class TaskRepository @Inject constructor(private val taskDao: TaskDao){
+     fun getAllTask(): LiveData<List<TaskEntity>> {
+        return taskDao.getAllTask()
     }
-    fun insertData(task: Task){
-        GlobalScope.launch(Dispatchers.IO) {
-            taskDao.insertTask(task)
-        }
+    suspend fun insertTask(taskEntity: TaskEntity){
+        taskDao.insertTask(taskEntity)
     }
-    fun deleteData(task: Task){
-        GlobalScope.launch(Dispatchers.IO) {
-            taskDao.deleteTask(task)
-        }
+    suspend fun deleteTask(taskEntity: TaskEntity){
+        taskDao.deleteTask(taskEntity)
     }
+
 }

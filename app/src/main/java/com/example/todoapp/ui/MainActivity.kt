@@ -4,20 +4,21 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todoapp.R
 import com.example.todoapp.adapter.MyAdapter
 import com.example.todoapp.adapter.RecyclerViewClickInterface
-import com.example.todoapp.room.Task
+import com.example.todoapp.room.TaskEntity
 import com.example.todoapp.viewModel.TaskViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.bottom_appbar.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity(), RecyclerViewClickInterface {
- val viewModel by lazy {
-     TaskViewModel(this)
- }
+private val viewModel:TaskViewModel by viewModels()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -46,8 +47,8 @@ class MainActivity : AppCompatActivity(), RecyclerViewClickInterface {
 
     }
 
-    override fun onClick(position: Int,task: Task) {
-        viewModel.taskRepo.deleteData(task)
+    override fun onClick(position: Int,task: TaskEntity) {
+        viewModel.deleteData(task)
         Toast.makeText(this,"Task Deleted Successfully",Toast.LENGTH_SHORT).show()
     }
 

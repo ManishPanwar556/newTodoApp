@@ -1,23 +1,17 @@
 package com.example.todoapp.room
 
 import androidx.lifecycle.LiveData
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Query
+import androidx.room.*
 
 @Dao
 interface TaskDao {
-    @Insert
-    suspend fun insertTask(task: Task)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertTask(task: TaskEntity)
 
     @Delete
-    suspend fun deleteTask(task: Task)
-
-    @Query("Select *from todo_table where id=:ind")
-    suspend fun getTask(ind: Long): Task
+    suspend fun deleteTask(task: TaskEntity)
 
     @Query("Select *from todo_table order by id desc")
-    fun getAllTask(): LiveData<List<Task>>
+    fun getAllTask(): LiveData<List<TaskEntity>>
 
 }

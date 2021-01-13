@@ -1,31 +1,44 @@
 package com.example.todoapp.viewModel
 
 
-import android.content.Context
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
+import androidx.hilt.Assisted
+import androidx.hilt.lifecycle.ViewModelInject
+import androidx.lifecycle.*
 import com.example.todoapp.repository.TaskRepository
-import com.example.todoapp.room.Task
+import com.example.todoapp.room.TaskEntity
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 
-class TaskViewModel(context: Context) : ViewModel() {
+class TaskViewModel @ViewModelInject constructor(
+    private val taskRepo: TaskRepository,
+    @Assisted private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
 
-    lateinit var property: LiveData<List<Task>>
 
-    val taskRepo = TaskRepository(context)
+    var property: LiveData<List<TaskEntity>>
+
 
     init {
-        property = getAllData()
+       property=taskRepo.getAllTask()
     }
 
     fun insertData(task: String, description: String) {
-        taskRepo.insertData(Task(task = task, description = description))
-        property=getAllData()
+       viewModelScope.launch(Dispatchers.IO) {
+               taskRepo.insertTask(TaskEntity(task = task, description = description))
+               property=taskRepo.getAllTask()
+       }
+
     }
 
-    fun getAllData() = taskRepo.getAllData()
+    fun getAllData() = taskRepo.getAllTask()
 
-    fun deleteData(task: Task){
-        taskRepo.deleteData(task)
+    fun deleteData(taskEntity: TaskEntity){
+        viewModelScope.launch (Dispatchers.IO){
+            taskRepo.deleteTask(taskEntity)
+            property=taskRepo.getAllTask()
+        }
+
     }
 }
